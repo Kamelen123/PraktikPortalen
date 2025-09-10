@@ -1,6 +1,13 @@
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using PraktikPortalen.Domain.Entities;
+using Microsoft.Extensions.DependencyInjection;
+using PraktikPortalen.Application.Mapping;
+using PraktikPortalen.Application.Services;
+using PraktikPortalen.Application.Services.Interfaces;
+using PraktikPortalen.Domain.Interfaces.Repositories;
 using PraktikPortalen.Infrastructure.Data;
+using PraktikPortalen.Infrastructure.Repositories;
+
 namespace PraktikPortalen
 {
     public class Program
@@ -9,19 +16,22 @@ namespace PraktikPortalen
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            // 1) Infrastructure: DbContext
+            builder.Services.AddDbContext<PraktikportalenDbContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+            // 2) Application: AutoMapper + Services/Repositories
+            builder.Services.AddAutoMapper(cfg => cfg.AddProfile<MappingProfile>());
+            builder.Services.AddScoped<IInternshipRepository, InternshipRepository>();
+            builder.Services.AddScoped<IInternshipService, InternshipService>();
+
+            // 3) Web API plumbing
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            builder.Services.AddDbContext<PraktikportalenDbContext>(options =>
-            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -31,7 +41,6 @@ namespace PraktikPortalen
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
 
             app.MapControllers();
 
