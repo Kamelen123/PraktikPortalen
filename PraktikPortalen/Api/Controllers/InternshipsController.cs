@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PraktikPortalen.Application.DTOs.Internships;
 using PraktikPortalen.Application.Services.Interfaces;
 
@@ -11,7 +12,7 @@ namespace PraktikPortalen.Api.Controllers
         private readonly IInternshipService _service;
 
         public InternshipsController(IInternshipService service) => _service = service;
-
+        [Authorize(Roles ="Admin")]
         [HttpGet("all")]
         public async Task<IActionResult> GetAll(CancellationToken ct) =>
             Ok(await _service.GetAllAsync(ct));

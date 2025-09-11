@@ -1,12 +1,18 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using PraktikPortalen.Application.Mapping;
+using PraktikPortalen.Application.Security;
 using PraktikPortalen.Application.Services;
 using PraktikPortalen.Application.Services.Interfaces;
+using PraktikPortalen.Domain.Entities;
 using PraktikPortalen.Domain.Interfaces.Repositories;
 using PraktikPortalen.Infrastructure.Data;
 using PraktikPortalen.Infrastructure.Repositories;
+using System.Text;
 
 namespace PraktikPortalen
 {
@@ -25,10 +31,71 @@ namespace PraktikPortalen
             builder.Services.AddScoped<IInternshipRepository, InternshipRepository>();
             builder.Services.AddScoped<IInternshipService, InternshipService>();
 
-            // 3) Web API plumbing
+            // 3) Auth: repositories + services + password hasher
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<ITokenService, TokenService>();
+            builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+
+            // 4) JWT options + authentication/authorization
+            builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
+
+            var jwt = builder.Configuration.GetSection("Jwt");
+            var keyBytes = Encoding.UTF8.GetBytes(jwt["Key"]!);
+
+            builder.Services
+                .AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidIssuer = jwt["Issuer"],
+                        ValidAudience = jwt["Audience"],
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(keyBytes),
+                        ValidateLifetime = true,
+                        ClockSkew = TimeSpan.Zero
+                    };
+                });
+
+            builder.Services.AddAuthorization();
+
+            // 5) Web API plumbing
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "PraktikPortalen API", Version = "v1" });
+
+                // JWT Bearer auth in Swagger
+                var jwtSecurityScheme = new OpenApiSecurityScheme
+                {
+                    Scheme = "bearer",
+                    BearerFormat = "JWT",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.Http,
+                    Description = "Put **ONLY** your JWT token here (no 'Bearer ' prefix).",
+                    Reference = new OpenApiReference
+                    {
+                        Id = JwtBearerDefaults.AuthenticationScheme,
+                        Type = ReferenceType.SecurityScheme
+                    }
+                };
+
+                c.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    { jwtSecurityScheme, Array.Empty<string>() }
+                });
+            });
 
             var app = builder.Build();
 
@@ -40,6 +107,7 @@ namespace PraktikPortalen
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();   // <-- must be before UseAuthorization
             app.UseAuthorization();
 
             app.MapControllers();
