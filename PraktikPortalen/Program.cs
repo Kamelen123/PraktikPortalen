@@ -4,15 +4,15 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Text;
+
 using PraktikPortalen.Application.Mapping;
 using PraktikPortalen.Application.Security;
 using PraktikPortalen.Application.Services;
 using PraktikPortalen.Application.Services.Interfaces;
 using PraktikPortalen.Domain.Entities;
-using PraktikPortalen.Domain.Interfaces.Repositories;
+using PraktikPortalen.Infrastructure;
 using PraktikPortalen.Infrastructure.Data;
-using PraktikPortalen.Infrastructure.Repositories;
-using System.Text;
 
 namespace PraktikPortalen
 {
@@ -26,16 +26,15 @@ namespace PraktikPortalen
             builder.Services.AddDbContext<PraktikportalenDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            // 2) Application: AutoMapper + Services/Repositories
+            // 2) Application: AutoMapper + Services
             builder.Services.AddAutoMapper(cfg => cfg.AddProfile<MappingProfile>());
-            builder.Services.AddScoped<IInternshipRepository, InternshipRepository>();
             builder.Services.AddScoped<IInternshipService, InternshipService>();
-
-            // 3) Auth: repositories + services + password hasher
-            builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+
+            // 3) Infrastructure registrations (repositories, etc.)
+            builder.Services.AddInfrastructure();
 
             // 4) JWT options + authentication/authorization
             builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
@@ -81,7 +80,7 @@ namespace PraktikPortalen
                     Name = "Authorization",
                     In = ParameterLocation.Header,
                     Type = SecuritySchemeType.Http,
-                    Description = "Put **ONLY** your JWT token here (no 'Bearer ' prefix).",
+                    Description = "Put ONLY your JWT token here (no 'Bearer ' prefix).",
                     Reference = new OpenApiReference
                     {
                         Id = JwtBearerDefaults.AuthenticationScheme,
@@ -90,7 +89,6 @@ namespace PraktikPortalen
                 };
 
                 c.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
-
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
                 {
                     { jwtSecurityScheme, Array.Empty<string>() }
@@ -106,8 +104,7 @@ namespace PraktikPortalen
             }
 
             app.UseHttpsRedirection();
-
-            app.UseAuthentication();   // <-- must be before UseAuthorization
+            app.UseAuthentication();   // must be before UseAuthorization
             app.UseAuthorization();
 
             app.MapControllers();

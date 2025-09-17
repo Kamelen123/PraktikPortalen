@@ -5,10 +5,10 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 	</PropertyGroup>
 
-	<!-- Remove any leftover “Remove=Application/**” etc once files are truly gone -->
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.19" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.9" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
 		<PackageReference Include="AutoMapper" Version="15.0.1" />
 		<PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.14.0" />
