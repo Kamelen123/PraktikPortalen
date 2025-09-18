@@ -11,6 +11,7 @@ namespace PraktikPortalen.Infrastructure
             // Repository registrations live here, not in the API.
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IInternshipRepository, InternshipRepository>();
+            services.AddScoped<ICompanyRepository, CompanyRepository>();
             return services;
         }
     }

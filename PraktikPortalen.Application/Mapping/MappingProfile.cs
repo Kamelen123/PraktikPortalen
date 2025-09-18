@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using PraktikPortalen.Application.DTOs.Companies;
 using PraktikPortalen.Application.DTOs.Internships;
 using PraktikPortalen.Domain.Entities;
 
@@ -19,6 +20,11 @@ namespace PraktikPortalen.Application.Mapping
 
             CreateMap<InternshipCreateDto, Internship>();
             CreateMap<InternshipUpdateDto, Internship>();
+
+            CreateMap<Company, CompanyListDto>();
+            CreateMap<Company, CompanyDetailDto>();
+            CreateMap<CompanyCreateDto, Company>();
+            CreateMap<CompanyUpdateDto, Company>();
         }
     }
 }

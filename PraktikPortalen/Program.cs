@@ -34,6 +34,7 @@ namespace PraktikPortalen
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+            builder.Services.AddScoped<ICompanyService, CompanyService>();
 
             // 3) Infrastructure registrations (repositories, etc.)
             builder.Services.AddInfrastructure();
