@@ -13,6 +13,8 @@ using PraktikPortalen.Application.Services.Interfaces;
 using PraktikPortalen.Domain.Entities;
 using PraktikPortalen.Infrastructure;
 using PraktikPortalen.Infrastructure.Data;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 
 namespace PraktikPortalen
 {
@@ -67,6 +69,8 @@ namespace PraktikPortalen
 
             // 5) Web API plumbing
             builder.Services.AddControllers();
+            builder.Services.AddFluentValidationAutoValidation();
+            builder.Services.AddValidatorsFromAssemblyContaining<PraktikPortalen.Application.Validation.Internships.InternshipCreateDtoValidator>();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(c =>
             {
