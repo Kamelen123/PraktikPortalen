@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using PraktikPortalen.Application.DTOs.Applications;
 using PraktikPortalen.Application.DTOs.Companies;
 using PraktikPortalen.Application.DTOs.Internships;
 using PraktikPortalen.Application.DTOs.Users;
@@ -40,6 +41,25 @@ namespace PraktikPortalen.Application.Mapping
                 .ForMember(d => d.PasswordHash, m => m.Ignore()); // password handled separately
 
             CreateMap<UserUpdateDto, User>();
+
+            // ------- InternshipApplication mappings -------
+            CreateMap<InternshipApplication, InternshipApplicationListDto>()
+                .ForMember(d => d.InternshipTitle, m => m.MapFrom(s => s.Internship.Title))
+                .ForMember(d => d.CompanyName, m => m.MapFrom(s => s.Internship.Company.Name))
+                .ForMember(d => d.Status, m => m.MapFrom(s => s.Status.ToString()));
+
+            CreateMap<InternshipApplication, InternshipApplicationDetailDto>()
+                .ForMember(d => d.InternshipTitle, m => m.MapFrom(s => s.Internship.Title))
+                .ForMember(d => d.CompanyName, m => m.MapFrom(s => s.Internship.Company.Name))
+                .ForMember(d => d.ApplicantEmail, m => m.MapFrom(s => s.Applicant.Email))
+                .ForMember(d => d.Status, m => m.MapFrom(s => s.Status.ToString()));
+
+            // DTOs → InternshipApplication
+            CreateMap<InternshipApplicationCreateDto, InternshipApplication>()
+                .ForMember(d => d.Status, m => m.Ignore())     // set in service
+                .ForMember(d => d.SubmittedAt, m => m.Ignore());    // set in service
+
+            CreateMap<InternshipApplicationUpdateDto, InternshipApplication>(); // maps Status/CoverLetter/CvUrl
         }
     }
 }
