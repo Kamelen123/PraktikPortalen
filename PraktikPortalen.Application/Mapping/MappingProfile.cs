@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using PraktikPortalen.Application.DTOs.Applications;
+using PraktikPortalen.Application.DTOs.Categories;
 using PraktikPortalen.Application.DTOs.Companies;
 using PraktikPortalen.Application.DTOs.Internships;
 using PraktikPortalen.Application.DTOs.Users;
@@ -60,6 +61,12 @@ namespace PraktikPortalen.Application.Mapping
                 .ForMember(d => d.SubmittedAt, m => m.Ignore());    // set in service
 
             CreateMap<InternshipApplicationUpdateDto, InternshipApplication>(); // maps Status/CoverLetter/CvUrl
+
+            // ------- Category mappings -------
+            CreateMap<Category, CategoryListDto>();
+            CreateMap<Category, CategoryDetailDto>();
+            CreateMap<CategoryCreateDto, Category>();
+            CreateMap<CategoryUpdateDto, Category>();
         }
     }
 }
