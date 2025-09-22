@@ -17,7 +17,6 @@ namespace PraktikPortalen.Controllers
         public async Task<IActionResult> GetAll(CancellationToken ct) =>
             Ok(await _service.GetAllAsync(ct));
 
-        [Authorize]
         [HttpGet("{id:int}/details")]
         public async Task<IActionResult> GetDetails(int id, CancellationToken ct)
         {
