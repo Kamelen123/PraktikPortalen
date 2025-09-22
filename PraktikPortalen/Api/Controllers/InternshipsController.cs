@@ -12,7 +12,7 @@ namespace PraktikPortalen.Api.Controllers
         private readonly IInternshipService _service;
 
         public InternshipsController(IInternshipService service) => _service = service;
-        [Authorize(Roles ="Admin")]
+
         [HttpGet("all")]
         public async Task<IActionResult> GetAll(CancellationToken ct) =>
             Ok(await _service.GetAllAsync(ct));
@@ -24,6 +24,7 @@ namespace PraktikPortalen.Api.Controllers
             return dto is null ? NotFound() : Ok(dto);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("create")]
         public async Task<IActionResult> Create([FromBody] InternshipCreateDto dto, CancellationToken ct)
         {
@@ -32,6 +33,7 @@ namespace PraktikPortalen.Api.Controllers
             return CreatedAtAction(nameof(GetById), new { id = newId }, null);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id:int}/update")]
         public async Task<IActionResult> Update(int id, [FromBody] InternshipUpdateDto dto, CancellationToken ct)
         {
@@ -40,6 +42,7 @@ namespace PraktikPortalen.Api.Controllers
             return ok ? NoContent() : NotFound();
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id:int}/delete")]
         public async Task<IActionResult> Delete(int id, CancellationToken ct)
         {

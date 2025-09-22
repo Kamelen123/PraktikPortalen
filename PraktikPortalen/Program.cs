@@ -1,20 +1,14 @@
-using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
-
-using PraktikPortalen.Application.Mapping;
 using PraktikPortalen.Application.Security;
-using PraktikPortalen.Application.Services;
-using PraktikPortalen.Application.Services.Interfaces;
-using PraktikPortalen.Domain.Entities;
 using PraktikPortalen.Infrastructure;
 using PraktikPortalen.Infrastructure.Data;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using PraktikPortalen.Application;
 
 namespace PraktikPortalen
 {
@@ -29,15 +23,7 @@ namespace PraktikPortalen
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             // 2) Application: AutoMapper + Services
-            builder.Services.AddAutoMapper(cfg => cfg.AddProfile<MappingProfile>());
-            builder.Services.AddScoped<IInternshipService, InternshipService>();
-            builder.Services.AddScoped<IAuthService, AuthService>();
-            builder.Services.AddScoped<ITokenService, TokenService>();
-            builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
-            builder.Services.AddScoped<ICompanyService, CompanyService>();
-            builder.Services.AddScoped<IUserService, UserService>();
-            builder.Services.AddScoped<IInternshipApplicationService, InternshipApplicationService>();
-            builder.Services.AddScoped<ICategoryService, CategoryService>();
+            builder.Services.AddApplication();
 
             // 3) Infrastructure registrations (repositories, etc.)
             builder.Services.AddInfrastructure();
