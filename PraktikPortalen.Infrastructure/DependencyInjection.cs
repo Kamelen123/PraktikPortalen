@@ -13,6 +13,7 @@ namespace PraktikPortalen.Infrastructure
             services.AddScoped<IInternshipRepository, InternshipRepository>();
             services.AddScoped<ICompanyRepository, CompanyRepository>();
             services.AddScoped<IInternshipApplicationRepository, InternshipApplicationRepository>();
+            services.AddScoped<ICategoryRepository, CategoryRepository>();
             return services;
         }
     }
