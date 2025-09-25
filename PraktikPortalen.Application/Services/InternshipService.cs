@@ -2,6 +2,7 @@
 using PraktikPortalen.Application.DTOs.Internships;
 using PraktikPortalen.Application.Services.Interfaces;
 using PraktikPortalen.Domain.Entities;
+using PraktikPortalen.Domain.Enums;
 using PraktikPortalen.Domain.Interfaces.Repositories;
 
 namespace PraktikPortalen.Application.Services
@@ -63,6 +64,13 @@ namespace PraktikPortalen.Application.Services
 
             await _repo.DeleteAsync(existing, ct);
             return await _repo.SaveChangesAsync(ct);
+        }
+
+        public async Task<List<InternshipListDto>> GetFilteredAsync(int? categoryId,
+        LocationType? locationType, bool? isOpen, CancellationToken ct = default)
+        {
+            var list = await _repo.GetFilteredAsync(categoryId, locationType, isOpen, ct);
+            return _mapper.Map<List<InternshipListDto>>(list);
         }
     }
 }
