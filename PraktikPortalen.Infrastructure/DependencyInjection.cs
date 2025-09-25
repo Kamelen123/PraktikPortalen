@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using PraktikPortalen.Domain.Interfaces.Repositories;
 using PraktikPortalen.Infrastructure.Repositories;
+using PraktikPortalen.Infrastructure.Services;
 
 namespace PraktikPortalen.Infrastructure
 {
@@ -14,6 +15,7 @@ namespace PraktikPortalen.Infrastructure
             services.AddScoped<ICompanyRepository, CompanyRepository>();
             services.AddScoped<IInternshipApplicationRepository, InternshipApplicationRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
+            services.AddHostedService<InternshipCleanupService>();
             return services;
         }
     }

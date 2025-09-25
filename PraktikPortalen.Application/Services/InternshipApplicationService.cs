@@ -10,12 +10,14 @@ namespace PraktikPortalen.Application.Services
     public class InternshipApplicationService : IInternshipApplicationService
     {
         private readonly IInternshipApplicationRepository _repo;
+        private readonly IInternshipRepository _internshipRepo;
         private readonly IMapper _mapper;
 
-        public InternshipApplicationService(IInternshipApplicationRepository repo, IMapper mapper)
+        public InternshipApplicationService(IInternshipApplicationRepository repo, IMapper mapper, IInternshipRepository internshipRepo)
         {
             _repo = repo;
             _mapper = mapper;
+            _internshipRepo = internshipRepo;
         }
 
         public async Task<List<InternshipApplicationListDto>> GetAllAsync(CancellationToken ct = default)
@@ -38,9 +40,21 @@ namespace PraktikPortalen.Application.Services
 
         public async Task<int> CreateAsync(InternshipApplicationCreateDto dto, CancellationToken ct = default)
         {
-            if (await _repo.ExistsForApplicantAsync(dto.InternshipId, dto.ApplicantId, ct))
-                throw new InvalidOperationException("Application already exists for this internship and applicant.");
+            // 1) Internship exists?
+            var internship = await _internshipRepo.GetByIdAsync(dto.InternshipId, ct);
+            if (internship is null)
+                throw new InvalidOperationException("Internship not found.");
 
+            // 2) Internship is open and not past deadline?
+            if (!internship.IsOpen || internship.ApplicationDeadline <= DateTime.UtcNow)
+                throw new InvalidOperationException("This internship is closed for applications.");
+
+            // 3) Prevent duplicate application (use the existing repo method)
+            var alreadyExists = await _repo.ExistsForApplicantAsync(dto.InternshipId, dto.ApplicantId, ct);
+            if (alreadyExists)
+                throw new InvalidOperationException("You have already applied for this internship.");
+
+            // 4) Map + set state
             var entity = _mapper.Map<InternshipApplication>(dto);
             entity.Status = ApplicationStatus.Submitted;
             entity.SubmittedAt = DateTime.UtcNow;
