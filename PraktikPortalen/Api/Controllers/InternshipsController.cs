@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PraktikPortalen.Application.DTOs.Internships;
 using PraktikPortalen.Application.Services.Interfaces;
+using PraktikPortalen.Domain.Enums;
 
 namespace PraktikPortalen.Api.Controllers
 {
@@ -48,6 +49,14 @@ namespace PraktikPortalen.Api.Controllers
         {
             var ok = await _service.DeleteAsync(id, ct);
             return ok ? NoContent() : NotFound();
+        }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> Search( [FromQuery] int? categoryId, [FromQuery] LocationType? locationType,
+        [FromQuery] bool? isOpen, CancellationToken ct)
+        {
+            var result = await _service.GetFilteredAsync(categoryId, locationType, isOpen, ct);
+            return Ok(result);
         }
     }
 }

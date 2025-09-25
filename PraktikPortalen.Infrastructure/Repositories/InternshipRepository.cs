@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PraktikPortalen.Domain.Entities;
+using PraktikPortalen.Domain.Enums;
 using PraktikPortalen.Domain.Interfaces.Repositories;
 using PraktikPortalen.Infrastructure.Data;
 
@@ -50,5 +51,28 @@ namespace PraktikPortalen.Infrastructure.Repositories
 
         public Task<bool> ExistsAsync(int id, CancellationToken ct = default) =>
             _db.Internships.AnyAsync(i => i.Id == id, ct);
+
+        public Task<List<Internship>> GetFilteredAsync(int? categoryId,
+        LocationType? locationType, bool? isOpen,CancellationToken ct = default)
+        {
+            var query = _db.Internships
+                .AsNoTracking()
+                .Include(i => i.Company)
+                .Include(i => i.Category)
+                .AsQueryable();
+
+            if (categoryId.HasValue && categoryId.Value > 0)
+                query = query.Where(i => i.CategoryId == categoryId.Value);
+
+            if (locationType.HasValue)
+                query = query.Where(i => i.LocationType == locationType.Value);
+
+            if (isOpen.HasValue)
+                query = query.Where(i => i.IsOpen == isOpen.Value);
+
+            return query
+                .OrderBy(i => i.ApplicationDeadline)
+                .ToListAsync(ct);
+        }
     }
 }

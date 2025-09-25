@@ -1,4 +1,5 @@
 ﻿using PraktikPortalen.Domain.Entities;
+using PraktikPortalen.Domain.Enums;
 
 namespace PraktikPortalen.Domain.Interfaces.Repositories
 {
@@ -11,5 +12,6 @@ namespace PraktikPortalen.Domain.Interfaces.Repositories
         Task DeleteAsync(Internship entity, CancellationToken ct = default);
         Task<bool> SaveChangesAsync(CancellationToken ct = default);
         Task<bool> ExistsAsync(int id, CancellationToken ct = default);
+        Task<List<Internship>> GetFilteredAsync(int? categoryId, LocationType? locationType, bool? isOpen, CancellationToken ct = default);
     }
 }
