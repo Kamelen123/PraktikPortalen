@@ -26,7 +26,7 @@ namespace PraktikPortalen.Api.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpPost("create")]
+        [HttpPost("create/(Admin)")]
         public async Task<IActionResult> Create([FromBody] InternshipCreateDto dto, CancellationToken ct)
         {
             if (!ModelState.IsValid) return ValidationProblem(ModelState);
@@ -35,7 +35,7 @@ namespace PraktikPortalen.Api.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpPut("{id:int}/update")]
+        [HttpPut("{id:int}/update/(Admin)")]
         public async Task<IActionResult> Update(int id, [FromBody] InternshipUpdateDto dto, CancellationToken ct)
         {
             if (!ModelState.IsValid) return ValidationProblem(ModelState);
@@ -44,7 +44,7 @@ namespace PraktikPortalen.Api.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpDelete("{id:int}/delete")]
+        [HttpDelete("{id:int}/delete/(Admin)")]
         public async Task<IActionResult> Delete(int id, CancellationToken ct)
         {
             var ok = await _service.DeleteAsync(id, ct);
