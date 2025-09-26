@@ -13,18 +13,18 @@ namespace PraktikPortalen.Controllers
         private readonly IUserService _service;
         public UsersController(IUserService service) => _service = service;
 
-        [HttpGet("all")]
+        [HttpGet("all/(Admin)")]
         public async Task<IActionResult> GetAll(CancellationToken ct) =>
             Ok(await _service.GetAllAsync(ct));
 
-        [HttpGet("{id:int}/details")]
+        [HttpGet("{id:int}/details/(Admin)")]
         public async Task<IActionResult> GetById(int id, CancellationToken ct)
         {
             var dto = await _service.GetByIdAsync(id, ct);
             return dto is null ? NotFound() : Ok(dto);
         }
 
-        [HttpPost("create")]
+        [HttpPost("create/(Admin)")]
         public async Task<IActionResult> Create([FromBody] UserCreateDto dto, CancellationToken ct)
         {
             if (!ModelState.IsValid) return ValidationProblem(ModelState);
@@ -32,7 +32,7 @@ namespace PraktikPortalen.Controllers
             return CreatedAtAction(nameof(GetById), new { id }, null);
         }
 
-        [HttpPut("{id:int}/update")]
+        [HttpPut("{id:int}/update/(Admin)")]
         public async Task<IActionResult> Update(int id, [FromBody] UserUpdateDto dto, CancellationToken ct)
         {
             if (!ModelState.IsValid) return ValidationProblem(ModelState);
@@ -40,7 +40,7 @@ namespace PraktikPortalen.Controllers
             return ok ? NoContent() : NotFound();
         }
 
-        [HttpDelete("{id:int}/delete")]
+        [HttpDelete("{id:int}/delete/(Admin)")]
         public async Task<IActionResult> Delete(int id, CancellationToken ct)
         {
             var ok = await _service.DeleteAsync(id, ct);

@@ -17,7 +17,7 @@ namespace PraktikPortalen.Controllers
             Ok(await _service.GetAllAsync(ct));
 
         [Authorize(Roles = "Admin")]
-        [HttpGet("{id:int}/details")]
+        [HttpGet("{id:int}/details/(Admin)")]
         public async Task<IActionResult> GetById(int id, CancellationToken ct)
         {
             var dto = await _service.GetByIdAsync(id, ct);
@@ -25,7 +25,7 @@ namespace PraktikPortalen.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpPost("create")]
+        [HttpPost("create/(Admin)")]
         public async Task<IActionResult> Create([FromBody] CategoryCreateDto dto, CancellationToken ct)
         {
             if (!ModelState.IsValid) return ValidationProblem(ModelState);
@@ -34,7 +34,7 @@ namespace PraktikPortalen.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpPut("{id:int}/update")]
+        [HttpPut("{id:int}/update/(Admin)")]
         public async Task<IActionResult> Update(int id, [FromBody] CategoryUpdateDto dto, CancellationToken ct)
         {
             if (!ModelState.IsValid) return ValidationProblem(ModelState);
@@ -43,7 +43,7 @@ namespace PraktikPortalen.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpDelete("{id:int}/delete")]
+        [HttpDelete("{id:int}/delete/(Admin)")]
         public async Task<IActionResult> Delete(int id, CancellationToken ct)
         {
             var ok = await _service.DeleteAsync(id, ct);

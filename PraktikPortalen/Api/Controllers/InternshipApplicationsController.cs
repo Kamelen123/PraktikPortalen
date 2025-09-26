@@ -13,7 +13,7 @@ namespace PraktikPortalen.Controllers
         public InternshipApplicationsController(IInternshipApplicationService service) => _service = service;
 
         [Authorize(Roles = "Admin")]
-        [HttpGet("all")]
+        [HttpGet("all/(Admin)")]
         public async Task<IActionResult> GetAll(CancellationToken ct) =>
             Ok(await _service.GetAllAsync(ct));
 
@@ -25,7 +25,7 @@ namespace PraktikPortalen.Controllers
         }
 
         [Authorize(Roles = "Member,Admin")]
-        [HttpPost("create")]
+        [HttpPost("create/(Member, Admin)")]
         public async Task<IActionResult> Create([FromBody] InternshipApplicationCreateDto dto, CancellationToken ct)
         {
             if (!ModelState.IsValid) return ValidationProblem(ModelState);
@@ -36,7 +36,7 @@ namespace PraktikPortalen.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpPut("{id:int}/update")]
+        [HttpPut("{id:int}/update/(Admin)")]
         public async Task<IActionResult> Update(int id, [FromBody] InternshipApplicationUpdateDto dto, CancellationToken ct)
         {
             if (!ModelState.IsValid) return ValidationProblem(ModelState);
@@ -45,7 +45,7 @@ namespace PraktikPortalen.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpDelete("{id:int}/delete")]
+        [HttpDelete("{id:int}/delete/(Admin)")]
         public async Task<IActionResult> Delete(int id, CancellationToken ct)
         {
             var ok = await _service.DeleteAsync(id, ct);
@@ -53,7 +53,7 @@ namespace PraktikPortalen.Controllers
         }
 
         [Authorize(Roles = "Member,Admin")]
-        [HttpGet("by-applicant/{applicantId:int}")]
+        [HttpGet("by-applicant/{applicantId:int}/(Member, Admin)")]
         public async Task<IActionResult> GetByApplicant(int applicantId, CancellationToken ct) =>
             Ok(await _service.GetByApplicantAsync(applicantId, ct));
     }
